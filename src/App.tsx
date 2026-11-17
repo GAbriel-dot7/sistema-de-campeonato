@@ -106,6 +106,7 @@ const defaultTournamentForm = {
   type: 'grupos',
   groupCount: 4,
   groupRounds: 1,
+  qualifiersPerGroup: 2,
   knockoutFormat: 'single' as 'single' | 'aggregate',
 };
 
@@ -580,7 +581,7 @@ function App() {
       knockoutFormat: tournamentForm.knockoutFormat,
       groupCount: Math.max(1, Number(tournamentForm.groupCount) || 1),
       groupRounds: Math.max(1, Number(tournamentForm.groupRounds) || 1),
-      qualifiersPerGroup: 2,
+      qualifiersPerGroup: Math.max(1, Number(tournamentForm.qualifiersPerGroup) || 1),
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       pointsWin: 3,
@@ -1125,6 +1126,18 @@ function App() {
             </label>
 
             <label className="space-y-2 text-sm text-slate-300">
+              Classificados por grupo
+              <input
+                type="number"
+                min="1"
+                value={tournamentForm.qualifiersPerGroup}
+                onChange={(event) => setTournamentForm((current) => ({ ...current, qualifiersPerGroup: Math.max(1, Number(event.target.value) || 1) }))}
+                className="w-full rounded-xl border border-white/10 bg-[#0d1715] px-3 py-2 text-white outline-none"
+              />
+              <span className="block text-xs text-slate-500">Escolha quantos avançam de cada grupo para o mata-mata.</span>
+            </label>
+
+            <label className="space-y-2 text-sm text-slate-300">
               Formato do mata-mata
               <select
                 value={tournamentForm.knockoutFormat}
@@ -1468,10 +1481,12 @@ function App() {
 
           <label className="space-y-2 text-sm text-slate-300">
             Classificados por grupo
-            <select
+            <input
+              type="number"
+              min="1"
               value={selectedTournament.qualifiersPerGroup ?? 2}
               onChange={(event) => {
-                const nextQualifiersPerGroup = Number(event.target.value);
+                const nextQualifiersPerGroup = Math.max(1, Number(event.target.value) || 1);
                 setTournaments((current) =>
                   current.map((tournament) =>
                     tournament.id === selectedTournament.id
@@ -1481,11 +1496,7 @@ function App() {
                 );
               }}
               className="w-full rounded-xl border border-white/10 bg-[#0d1715] px-3 py-2 text-white outline-none"
-            >
-              {Array.from({ length: 8 }, (_, index) => index + 1).map((count) => (
-                <option key={count} value={count}>{count}</option>
-              ))}
-            </select>
+            />
             <span className="block text-xs text-slate-500">A classificação é definida pela tabela de cada grupo.</span>
           </label>
         </div>
